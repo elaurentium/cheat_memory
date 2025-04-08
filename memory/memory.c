@@ -6,16 +6,25 @@
 #include <unistd.h>
 
 
-void* memo_map(size_t lenght) {
-    void* ptr;
-    // Linux/macOS/Unix: usage mmap
-    ptr = mmap(NULL, lenght, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-    if (ptr == MAP_FAILED) {
-        perror("Erro to try map memory on Linux/macOS");
-        return NULL;
+void map_memo(pid_t pid) {
+    char path[256];
+
+    snprintf(path, sizeof(path), "/proc/%d/maps", pid);
+
+    FILE* file = fopen(path, 'r');
+
+    if (!file) {
+        printf("Cannot open file");
+        return;
     }
 
-    return ptr;
+    printf("Map of process: %d: \n\n", pid);
+    char line[1024];
+    while (fgets(line, sizeof(line), file)) {
+        printf("%s", line);
+    }
+
+    fclose(file);
 }
 
 void free_memo(int* ptr, size_t lenght) {
@@ -33,12 +42,18 @@ size_t memo_lenght() {
 
 int main() {
     size_t lenght = memo_lenght();
-    void* ptr = memo_map(lenght);
+    pid_t pid;
 
     printf("-----------------------------------------------------------------------------------------\n");
     printf("/                                   CHEAT MEMORY                                        /\n");
     printf("-----------------------------------------------------------------------------------------\n");
 
-    memo_map(lenght);
-    free_memo(ptr, lenght);
+    printf("Type process PID: \n");
+    scanf("%d", &pid);
+
+    void map = map_memo(pid);
+
+    if (map) {
+        free_memo((int)pid, lenght)
+    }
 }
