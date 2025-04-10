@@ -1,5 +1,7 @@
 run:
 	gcc -o memo memory/memory.c
+	g++ -o process memory/process.c
 
-delete:
+clean:
 	rm -fr memo
+	rm -fr process

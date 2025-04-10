@@ -2,5 +2,6 @@
     "files.associations": {
         "*.pyx": "python",
         "stdlib.h": "c"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc"
 }
