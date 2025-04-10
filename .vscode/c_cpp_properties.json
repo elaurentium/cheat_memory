@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": []
+            "defines": [],
+            "configurationProvider": "ms-vscode.makefile-tools"
         }
     ],
     "version": 4
