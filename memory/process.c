@@ -169,10 +169,16 @@ int main() {
     printf("Type process name: ");
     fgets(search_term, sizeof(search_term), stdin);
     search_term[strcspn(search_term, "\n")] = 0;
+
+    if (is_number(search_term)) {
+        int result = search_process_by_pid(processes, num_processes, search_term, &single_result);
+        print_processes(&single_result, result);
+    } else {
+        int results_count = search_processes_by_name(processes, num_processes, 
+                                                    search_term, search_results, MAX_PROCESSES);
+        print_processes(search_results, results_count);
+    }
     
-    int results_count = search_processes_by_name(processes, num_processes, 
-                                                search_term, search_results, MAX_PROCESSES);
-    print_processes(search_results, results_count);
          
     return 0;
 }
