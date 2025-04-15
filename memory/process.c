@@ -8,6 +8,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <ctype.h>
+#include "bytes.h"
 
 #define MAX_PATH_LENGTH 256
 #define MAX_NAME_LENGTH 1024
@@ -18,6 +19,9 @@ typedef struct {
     char pname[MAX_NAME_LENGTH];
 } ProcessInfo;
 
+/**********************************************************************/
+// VERIFY IF INPUT WAS A NUMBER OR NOT
+/***********************************************************************/
 int is_number(const char *s) {
     if (s == NULL || *s == '\0') {
         return 0; 
@@ -32,6 +36,10 @@ int is_number(const char *s) {
     
     return 1; 
 }
+
+/**********************************************************************/
+// COLLECT PROCESS PID
+/***********************************************************************/
 
 char* process_pid(const char *pid, char *buffer, size_t buffer_size) {
     if (buffer == NULL || buffer_size == 0) {
@@ -62,6 +70,10 @@ char* process_pid(const char *pid, char *buffer, size_t buffer_size) {
     return buffer;
 }
 
+/**********************************************************************/
+// LITERALLY A GET ALL PROCESS THAT RUNNING ON THE SYSTEM
+/***********************************************************************/
+
 int collect_processes(ProcessInfo *processes_array, int max_processes) {
     DIR *dir = opendir("/proc");
     if (dir == NULL) {
@@ -86,6 +98,10 @@ int collect_processes(ProcessInfo *processes_array, int max_processes) {
     closedir(dir);
     return count;
 }
+
+/**********************************************************************/
+// SEARCH PROCESS BY NAME
+/***********************************************************************/
 
 int search_processes_by_name(ProcessInfo *processes_array, int num_processes, 
                              const char *search_term, ProcessInfo *results, int max_results) {
@@ -117,6 +133,10 @@ int search_processes_by_name(ProcessInfo *processes_array, int num_processes,
     return count;
 }
 
+/**********************************************************************/
+// SEARCH PROCESS BY PID
+/***********************************************************************/
+
 int search_process_by_pid(ProcessInfo *processes_array, int num_processes, 
                           const char *pid, ProcessInfo *result) {
     for (int i = 0; i < num_processes; i++) {
@@ -129,6 +149,10 @@ int search_process_by_pid(ProcessInfo *processes_array, int num_processes,
     return 0;
 }
 
+/**********************************************************************/
+// ONLY PRINT PROCESSES
+// TODO: ADD MORE FUNCTIONALITY
+/***********************************************************************/
 void print_processes(ProcessInfo *processes_array, int num_processes) {
     if (num_processes == 0) {
         printf("No one find.\n");
@@ -136,12 +160,10 @@ void print_processes(ProcessInfo *processes_array, int num_processes) {
     }
     
     for (int i = 0; i < num_processes; i++) {
-        printf("PID: %s | Name: %s\n", 
+        printf("PID: %s | Path: %s\n", 
                processes_array[i].pid, 
                processes_array[i].pname);
     }
-    
-    printf("Total : %d\n", num_processes);
 }
 
 int main() {
@@ -171,8 +193,12 @@ int main() {
     search_term[strcspn(search_term, "\n")] = 0;
 
     if (is_number(search_term)) {
+        pid_t target_pid = atoi(search_term);
         int result = search_process_by_pid(processes, num_processes, search_term, &single_result);
+        Memo_Region regions[MAX_REGIONS];
+        int count = parse_maps(target_pid, regions, MAX_REGIONS);
         print_processes(&single_result, result);
+        read_memory(target_pid, regions, count);
     } else {
         int results_count = search_processes_by_name(processes, num_processes, 
                                                     search_term, search_results, MAX_PROCESSES);
