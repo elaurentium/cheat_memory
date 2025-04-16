@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BINARY="cheat"
+BINARY="cheat" # COMPILED BINARY
 
 
 if [ ! -f "$BINARY" ]; then
