@@ -10,6 +10,7 @@
 #define MAX_BUF 4096
 #define PATH 64
 #define MAX_REGIONS 1024
+#define BLOCK_SIZE 4096
 
 
 typedef struct {
@@ -27,7 +28,7 @@ int parse_maps(pid_t pid, Memo_Region *regions, int max_regions) {
 
     FILE *file = fopen(path, "r");
     if (file == NULL) {
-        fprintf(stderr, "Failed to open file\n");
+        fprintf(stderr, "Failed to open %s: %s\n", path, strerror(errno));
         return 0;
     }
 
@@ -37,6 +38,7 @@ int parse_maps(pid_t pid, Memo_Region *regions, int max_regions) {
     while (fgets(line, sizeof(line), file) != NULL && num_regions < max_regions) {
         char *start = line;
         char *end = strchr(line, '-');
+
         if (end != NULL) {
             *end = '\0';
             regions[num_regions].start = strtoul(start, NULL, 16);
@@ -61,6 +63,7 @@ void read_memory(pid_t pid, Memo_Region *regions, int region_count) {
     int fd = open(memo_path, O_RDONLY);
     if (fd == -1) {
         perror("open");
+        fprintf(stderr, "Needed root privileges\n");
         return;
     }
 

@@ -203,6 +203,12 @@ int main() {
         int results_count = search_processes_by_name(processes, num_processes, 
                                                     search_term, search_results, MAX_PROCESSES);
         print_processes(search_results, results_count);
+        if (results_count > 0) {
+            pid_t target_pid = atoi(search_results[0].pid);
+            Memo_Region regions[MAX_REGIONS];
+            int count = parse_maps(target_pid, regions, MAX_REGIONS);
+            read_memory(target_pid, regions, count);
+        }
     }
     
          

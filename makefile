@@ -1,20 +1,20 @@
 CC = gcc
-OBJS = memory/proc.o memory/bytes.o
+OBJS = bin/proc.o bin/bytes.o
 TAGRET = cheat
 PROG = memory/bytes.c memory/process.c
 
 $(TAGRET): $(OBJS)
 	$(CC) -o $(TAGRET) $(OBJS)
 
-memory/proc.o: memory/process.c
-	$(CC) -c memory/process.c
+bin/proc.o: memory/process.c
+	$(CC) -c memory/process.c -o bin/proc.o
 
-memory/bytes.o: memory/bytes.c
-	$(CC) -c memory/bytes.c
+bin/bytes.o: memory/bytes.c
+	$(CC) -c memory/bytes.c -o bin/bytes.o
 
 run:
 	$(CC) -o $(TAGRET) $(PROG)
 
 clean:
-	rm -rf *.o $(TAGRET)
+	rm -rf bin/*.o $(TAGRET)
 	rm -rf $(TAGRET)
