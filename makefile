@@ -1,9 +1,10 @@
 CC = gcc
 TAGRET = cheat
-PROG = memory/bytes.c memory/process.c
+PROG = memory/bytes.c process/process.c
+CFLAGS = -Iinclude
 
 run:
-	$(CC) -o $(TAGRET) $(PROG)
+	$(CC) -o $(TAGRET) $(PROG) $(CFLAGS)
 
 clean:
 	rm -rf *.o $(TAGRET)
