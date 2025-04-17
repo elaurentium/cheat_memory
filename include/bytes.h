@@ -31,4 +31,9 @@ int parse_maps(pid_t pid, Memo_Region *regions, int max_regions);
 /***********************************************************************/
 void read_memory(pid_t pid, Memo_Region *regions, int region_count);
 
+/**********************************************************************/
+// MONITOR CHANGES MEMORY
+/***********************************************************************/
+void monitor_changes(pid_t pid, Memo_Region *regions, int region_count);
+
 #endif

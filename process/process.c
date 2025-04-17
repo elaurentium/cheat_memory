@@ -155,7 +155,7 @@ int search_process_by_pid(ProcessInfo *processes_array, int num_processes,
 /***********************************************************************/
 void print_processes(ProcessInfo *processes_array, int num_processes) {
     if (num_processes == 0) {
-        printf("No one find.\n");
+        printf("No process found\n");
         return;
     }
     
@@ -199,6 +199,7 @@ int main() {
         int count = parse_maps(target_pid, regions, MAX_REGIONS);
         print_processes(&single_result, result);
         read_memory(target_pid, regions, count);
+        monitor_changes(target_pid, regions, count);
     } else {
         int results_count = search_processes_by_name(processes, num_processes, 
                                                     search_term, search_results, MAX_PROCESSES);
@@ -208,6 +209,7 @@ int main() {
             Memo_Region regions[MAX_REGIONS];
             int count = parse_maps(target_pid, regions, MAX_REGIONS);
             read_memory(target_pid, regions, count);
+            monitor_changes(target_pid, regions, count);
         }
     }
     

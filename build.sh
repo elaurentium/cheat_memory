@@ -17,3 +17,4 @@ fi
 
 echo "binary info:"
 ls -l "$BINARY"
+sudo ./"$BINARY"
