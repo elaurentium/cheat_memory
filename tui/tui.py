@@ -4,30 +4,7 @@ import random
 import math
 from itertools import cycle
 
-# ASCII Art animado para o cabeçalho
 HEADER_FRAMES = [
-    [
-        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
-        "┃                                                                                   ┃",
-        "┃   ██████╗██╗  ██╗███████╗ █████╗ ████████╗    ███╗   ███╗███████╗███╗   ███╗ ██████╗  ┃",
-        "┃  ██╔════╝██║  ██║██╔════╝██╔══██╗╚══██╔══╝    ████╗ ████║██╔════╝████╗ ████║██╔═══██╗ ┃",
-        "┃  ██║     ███████║█████╗  ███████║   ██║       ██╔████╔██║█████╗  ██╔████╔██║██║   ██║ ┃",
-        "┃  ██║     ██╔══██║██╔══╝  ██╔══██║   ██║       ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║██║   ██║ ┃",
-        "┃  ╚██████╗██║  ██║███████╗██║  ██║   ██║       ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║╚██████╔╝ ┃",
-        "┃   ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝       ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝  ┃",
-        "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-    ],
-    [
-        "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
-        "┃                                                                                   ┃",
-        "┃   ██████╗██╗  ██╗███████╗ █████╗ ████████╗    ███╗   ███╗███████╗███╗   ███╗ ██████╗  ┃",
-        "┃  ██╔════╝██║  ██║██╔════╝██╔══██╗╚══██╔══╝    ████╗ ████║██╔════╝████╗ ████║██╔═══██╗ ┃",
-        "┃  ██║     ███████║█████╗  ███████║   ██║       ██╔████╔██║█████╗  ██╔████╔██║██║   ██║ ┃",
-        "┃  ██║     ██╔══██║██╔══╝  ██╔══██║   ██║       ██║╚██╔╝██║██╔══╝  ██║╚██╔╝██║██║   ██║ ┃",
-        "┃  ╚██████╗██║  ██║███████╗██║  ██║   ██║▄█╗    ██║ ╚═╝ ██║███████╗██║ ╚═╝ ██║╚██████╔╝ ┃",
-        "┃   ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝╚═╝    ╚═╝     ╚═╝╚══════╝╚═╝     ╚═╝ ╚═════╝  ┃",
-        "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-    ],
     [
         "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
         "┃                                                                                        ┃",
@@ -41,7 +18,6 @@ HEADER_FRAMES = [
     ]
 ]
 
-# Caracteres para barras estilizadas
 BAR_CHARS = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
 BOX_STYLES = [
     {"title": "═══ {} ═══", "tl": "╔", "tr": "╗", "bl": "╚", "br": "╝", "h": "═", "v": "║"},
@@ -50,13 +26,6 @@ BOX_STYLES = [
     {"title": "╔══ {} ══╗", "tl": "╔", "tr": "╗", "bl": "╚", "br": "╝", "h": "═", "v": "║"}
 ]
 
-STATUS_ICONS = {
-    "Running": "⚡",
-    "Sleeping": "💤",
-    "Stopped": "⏹️",
-    "Zombie": "💀",
-    "Idle": "⌛"
-}
 
 def init_colors():
     """Inicializa cores mais vibrantes e gradientes"""
@@ -197,13 +166,13 @@ def draw_horizontal_bar_chart(stdscr, y, x, h, w, data, current_time):
     except curses.error:
         pass
 
-def draw_process_list(stdscr, y, x, h, w, processes, selected_idx, selected_process_idx, current_time):
-    """Desenha lista de processos com efeitos de destaque e animações"""
+def draw_process_list(stdscr, y, x, h, w, processes, selected_idx, selected_process_idx, scroll_offset, current_time):
+    """Desenha lista de processos com PID e Path, com rolagem"""
     box_style = BOX_STYLES[3]
     draw_box(stdscr, y, x, h, w, "⚡ Process Monitor ⚡", box_style, 10)
     
     try:
-        header = "PID    CPU%  MEM%  STATUS"
+        header = "PID     Path"
         header_y = y + 1
         stdscr.addstr(header_y, x + 2, header, curses.color_pair(4) | curses.A_BOLD)
         
@@ -213,42 +182,39 @@ def draw_process_list(stdscr, y, x, h, w, processes, selected_idx, selected_proc
         list_start_y = y + 3
         visible_rows = h - 5
         
-        for i, proc in enumerate(processes):
-            if i >= visible_rows:
-                break
-                
+        # Calcula os índices dos processos visíveis
+        start_idx = scroll_offset
+        end_idx = min(start_idx + visible_rows, len(processes))
+        
+        for i, proc_idx in enumerate(range(start_idx, end_idx)):
+            proc = processes[proc_idx]
             row_y = list_start_y + i
-            status_icon = STATUS_ICONS.get(proc['status'], "•")
-            line = f"{proc['pid']:<6} {proc['cpu']:<5} {proc['mem']:<5} {status_icon} {proc['status']}"
+            path = proc['path'][:w-14]  # Trunca o path para caber na tela
+            line = f"{proc['pid']:<7} {path}"
             
             style = curses.A_NORMAL
             color = 4
             
-            if i == selected_idx:
+            if proc_idx == selected_idx:
                 style |= curses.A_BOLD
                 color = 8
                 if int(current_time * 2) % 2 == 0:
                     style |= curses.A_REVERSE
             
-            if i == selected_process_idx:
+            if proc_idx == selected_process_idx:
                 prefix = "✓ "
                 color = 9
             else:
                 prefix = "  "
             
-            if proc['cpu'] > 30 or proc['mem'] > 15:
-                if i != selected_idx and i != selected_process_idx:
-                    style |= curses.A_BOLD
-                    if proc['cpu'] > 40 or proc['mem'] > 18:
-                        color = 11
-            
             stdscr.addstr(row_y, x + 2, prefix + line, curses.color_pair(color) | style)
             
-            if i == selected_idx:
-                cpu_bar_x = x + w - 20
-                cpu_bar_width = 14
-                stdscr.addstr(row_y, cpu_bar_x - 4, "CPU:", curses.color_pair(4))
-                draw_fancy_bar(stdscr, row_y, cpu_bar_x, cpu_bar_width, proc['cpu'], 1)
+        # Indicador de rolagem
+        if len(processes) > visible_rows:
+            scroll_percent = min(100, int(scroll_offset / max(1, len(processes) - visible_rows) * 100))
+            scroll_indicator = f"▲ {scroll_percent}% ▼"
+            stdscr.addstr(y + h - 2, x + w - len(scroll_indicator) - 2, 
+                         scroll_indicator, curses.color_pair(7))
                 
     except curses.error:
         pass
@@ -307,24 +273,76 @@ def draw_header(stdscr, y, x, w, current_frame):
     except curses.error:
         pass
 
-def generate_random_processes(num=10):
-    """Gera processos aleatórios com nomes mais interessantes"""
-    process_names = ["system", "browser", "editor", "server", "database", 
-                    "network", "kernel", "logger", "cache", "monitor", 
-                    "backup", "security", "crypto", "media", "compiler"]
-    statuses = ["Running", "Sleeping", "Stopped", "Zombie", "Idle"]
-    
-    processes = []
-    for i in range(num):
-        name = random.choice(process_names)
-        processes.append({
-            "pid": f"{1000 + i}",
-            "cpu": random.randint(5, 50),
-            "mem": random.randint(1, 20),
-            "status": random.choice(statuses),
-            "name": f"{name}_{i}"
-        })
-    return processes
+def get_process_list():
+    """Retorna a lista de processos fornecida"""
+    return [
+        {"pid": "1", "path": "/sbin/init"},
+        {"pid": "2", "path": "/init"},
+        {"pid": "6", "path": "plan9"},
+        {"pid": "58", "path": "/usr/lib/systemd/systemd-journald"},
+        {"pid": "102", "path": "/usr/lib/systemd/systemd-udevd"},
+        {"pid": "149", "path": "/usr/lib/systemd/systemd-resolved"},
+        {"pid": "150", "path": "/usr/lib/systemd/systemd-timesyncd"},
+        {"pid": "161", "path": "/usr/sbin/cron"},
+        {"pid": "162", "path": "@dbus-daemon"},
+        {"pid": "176", "path": "/usr/lib/systemd/systemd-logind"},
+        {"pid": "179", "path": "/usr/libexec/wsl-pro-service"},
+        {"pid": "187", "path": "/sbin/agetty"},
+        {"pid": "197", "path": "/sbin/agetty"},
+        {"pid": "198", "path": "/usr/sbin/rsyslogd"},
+        {"pid": "218", "path": "/usr/bin/python3"},
+        {"pid": "225", "path": "sshd: /usr/sbin/sshd -D [listener] 0 of 10-100 startups"},
+        {"pid": "246", "path": "/usr/bin/containerd"},
+        {"pid": "458", "path": "/init"},
+        {"pid": "459", "path": "/init"},
+        {"pid": "460", "path": "-zsh"},
+        {"pid": "461", "path": "/bin/login"},
+        {"pid": "464", "path": "/usr/bin/dockerd"},
+        {"pid": "544", "path": "/usr/lib/systemd/systemd"},
+        {"pid": "545", "path": "(sd-pam)"},
+        {"pid": "558", "path": "-zsh"},
+        {"pid": "1229", "path": "/init"},
+        {"pid": "11919", "path": "/init"},
+        {"pid": "12888", "path": "/usr/lib/polkit-1/polkitd"},
+        {"pid": "40414", "path": "/init"},
+        {"pid": "40415", "path": "/init"},
+        {"pid": "40416", "path": "sh"},
+        {"pid": "40417", "path": "sh"},
+        {"pid": "40422", "path": "sh"},
+        {"pid": "40426", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40437", "path": "/init"},
+        {"pid": "40438", "path": "/init"},
+        {"pid": "40439", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40446", "path": "/init"},
+        {"pid": "40447", "path": "/init"},
+        {"pid": "40448", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40449", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40467", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40507", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40528", "path": "/init"},
+        {"pid": "40531", "path": "/init"},
+        {"pid": "40540", "path": "/init"},
+        {"pid": "40572", "path": "/home/evandro/.vscode-server/extensions/ms-python.python-2025.4.0-linux-x64/python-env-tools/bin/pet"},
+        {"pid": "40697", "path": "/init"},
+        {"pid": "40698", "path": "/init"},
+        {"pid": "40699", "path": "/bin/sh"},
+        {"pid": "40700", "path": "/bin/sh"},
+        {"pid": "40710", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40786", "path": "/usr/bin/zsh"},
+        {"pid": "40788", "path": "/usr/bin/zsh"},
+        {"pid": "40880", "path": "/bin/sh"},
+        {"pid": "40906", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "40947", "path": "/home/evandro/.vscode-server/extensions/ms-vscode.cpptools-1.25.0-linux-x64/bin/cpptools"},
+        {"pid": "40962", "path": "/usr/bin/zsh"},
+        {"pid": "41001", "path": "/home/evandro/.vscode-server/bin/7c6fdfb0b8f2f675eb0b47f3d95eeca78962565b/node"},
+        {"pid": "41175", "path": "/home/evandro/.vscode-server/extensions/codeium.codeium-1.42.7/dist/c2d78b189732d0db86e3055e1a49c2a75d623a38/language_server_linux_x64"},
+        {"pid": "41188", "path": "/home/evandro/.vscode-server/extensions/codeium.codeium-1.42.7/dist/c2d78b189732d0db86e3055e1a49c2a75d623a38/language_server_linux_x64"},
+        {"pid": "41621", "path": "/home/evandro/.vscode-server/extensions/ms-vscode.cpptools-1.25.0-linux-x64/bin/cpptools-srv"},
+        {"pid": "41810", "path": "/bin/bash"},
+        {"pid": "41829", "path": "sudo"},
+        {"pid": "41830", "path": "sudo"},
+        {"pid": "41831", "path": "./cheat"}
+    ]
 
 def generate_demo_text():
     """Gera texto de demonstração mais informativo"""
@@ -370,13 +388,14 @@ def main(stdscr):
     selected_idx = 0
     selected_process_idx = None
     text_scroll = 0
+    process_scroll = 0  # Novo: deslocamento de rolagem para a lista de processos
     animation_frame = 0
     frame_cycle = cycle(range(len(HEADER_FRAMES)))
 
-    processes = generate_random_processes(12)
+    processes = get_process_list()
     text_content = generate_demo_text()
 
-    key_hints = ["q: Quit", "↑↓: Navigate", "Enter: Select", "r: Refresh", "PgUp/PgDn: Scroll"]
+    key_hints = ["q: Quit", "↑↓: Navigate", "Enter: Select", "r: Refresh", "PgUp/PgDn: Scroll Text"]
 
     processes_style = BOX_STYLES[0]
     chart_style = BOX_STYLES[1]
@@ -396,10 +415,6 @@ def main(stdscr):
 
         if frame_count % 10 == 0:
             animation_frame = next(frame_cycle)
-        if frame_count % 30 == 0:
-            for proc in processes:
-                proc["cpu"] = max(5, min(proc["cpu"] + random.randint(-5, 5), 95))
-                proc["mem"] = max(1, min(proc["mem"] + random.randint(-2, 2), 50))
 
         h, w = stdscr.getmaxyx()
         if h < 24 or w < 80:
@@ -437,7 +452,7 @@ def main(stdscr):
         draw_header(stdscr, 0, 0, w, animation_frame)
         draw_status_bar(stdscr, h - status_h, 0, w, key_hints)
 
-        draw_process_list(stdscr, header_h, 0, proc_h, proc_w, processes, selected_idx, selected_process_idx, current_time)
+        draw_process_list(stdscr, header_h, 0, proc_h, proc_w, processes, selected_idx, selected_process_idx, process_scroll, current_time)
 
         cpu_data = {
             "Core1": random.randint(10, 90),
@@ -465,14 +480,24 @@ def main(stdscr):
             if key == ord('q'):
                 break
             elif key == curses.KEY_UP:
-                selected_idx = max(0, selected_idx - 1)
+                if selected_idx > 0:
+                    selected_idx -= 1
+                    # Ajusta o scroll para manter o item selecionado visível
+                    if selected_idx < process_scroll:
+                        process_scroll = selected_idx
             elif key == curses.KEY_DOWN:
-                selected_idx = min(len(processes) - 1, selected_idx + 1)
+                if selected_idx < len(processes) - 1:
+                    selected_idx += 1
+                    # Ajusta o scroll para manter o item selecionado visível
+                    if selected_idx >= process_scroll + (proc_h - 5):
+                        process_scroll = selected_idx - (proc_h - 6)
             elif key == curses.KEY_ENTER or key in [10, 13]:
                 selected_process_idx = selected_idx
             elif key == ord('r'):
-                processes = generate_random_processes(12)
+                processes = get_process_list()
                 text_content = generate_demo_text()
+                selected_idx = min(selected_idx, len(processes) - 1)  # Evita índice inválido
+                process_scroll = min(process_scroll, max(0, len(processes) - (proc_h - 5)))
             elif key == curses.KEY_PAGEDOWN:
                 text_scroll = min(len(text_content.split('\n')) - text_h + 4, text_scroll + text_h - 4)
             elif key == curses.KEY_PAGEUP:
@@ -480,6 +505,9 @@ def main(stdscr):
             elif key == curses.KEY_RESIZE:
                 h, w = stdscr.getmaxyx()
                 stdscr.clear()
+                # Ajusta scroll e índice para evitar ultrapassar limites
+                selected_idx = min(selected_idx, len(processes) - 1)
+                process_scroll = min(process_scroll, max(0, len(processes) - (proc_h - 5)))
         except curses.error:
             continue
 
