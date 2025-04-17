@@ -9,3 +9,6 @@ run:
 clean:
 	rm -rf *.o $(TAGRET)
 	rm -rf $(TAGRET)
+
+python:
+	python3 tui/tui.py
